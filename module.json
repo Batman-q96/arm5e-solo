@@ -4,8 +4,19 @@
     "description": "Tools and workflow support for solo Ars Magica Fifth Edition play.",
     "version": "0.1.0",
     "compatibility": {
-        "minimum": "13",
-        "verified": "13"
+        "minimum": "13.351",
+        "verified": "14.365"
+    },
+    "relationships": {
+        "systems": [
+            {
+                "id": "arm5e",
+                "type": "system",
+                "compatibility": {
+                    "minimum": "3.0.1"
+                }
+            }
+        ]
     },
     "authors": [
         {

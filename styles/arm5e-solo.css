@@ -1,1 +1,33 @@
-/* Module styles live here. */
+.arm5e-solo-dashboard {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+}
+
+.solo-dashboard-header {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.solo-finances table {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.solo-finance-results {
+    border-left: 3px solid var(--color-warm-2);
+}
+
+.solo-story-source {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: 1fr 120px 32px;
+    margin-bottom: 6px;
+}
+
+.solo-adventure-results {
+    margin-top: 10px;
+    width: 100%;
+}

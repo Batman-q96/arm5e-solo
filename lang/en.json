@@ -1,9 +1,45 @@
 {
     "ARM5E_SOLO": {
+        "SystemRequired": "ArM5e Solo requires the ArM5e game system.",
         "Settings": {
             "Enabled": {
                 "Name": "Enable ArM5e Solo",
                 "Hint": "Enable the ArM5e Solo module features for this world."
+            }
+        },
+        "Dashboard": {
+            "Title": "ArM5e Solo Adventures",
+            "Open": "Open solo adventure dashboard",
+            "Covenant": "Covenant",
+            "Year": "Year",
+            "NoCovenant": "Create or select a covenant actor before using solo adventures.",
+            "NoYear": "The ArM5e calendar does not have a valid current year.",
+            "YearReminder": "ArM5e Solo: annual setup is due for {{year}}."
+        },
+        "Finance": {
+            "Title": "Step 0: Covenant Finances",
+            "Source": "Income Source",
+            "Type": "Type",
+            "Income": "Current Income",
+            "NewIncome": "New Income",
+            "Effect": "Effect",
+            "Multiplier": "Multiplier",
+            "Roll": "Roll income sources",
+            "Apply": "Apply annual income changes",
+            "NoSources": "This covenant has no income sources. Add incomingSource items on its Economics tab.",
+            "AlreadyRolled": "Finances have already been recorded for this year.",
+            "RollFlavor": "Annual income roll: {{source}}",
+            "ConfirmTitle": "Apply income changes?",
+            "ConfirmContent": "This permanently updates each covenant income source and records the annual results.",
+            "Applied": "Annual income changes applied.",
+            "Effects": {
+                "slump": "Slump",
+                "contraction": "Contraction",
+                "stagnation": "Stagnation",
+                "statusQuo": "Status Quo",
+                "growth": "Growth",
+                "expansion": "Expansion",
+                "boom": "Boom"
             }
         }
     }

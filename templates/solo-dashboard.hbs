@@ -1,0 +1,120 @@
+<section class="arm5e-solo-dashboard">
+    <header class="solo-dashboard-header">
+        <label for="arm5e-solo-covenant">{{localize "ARM5E_SOLO.Dashboard.Covenant"}}</label>
+        <select id="arm5e-solo-covenant" name="covenantId" {{disabled (not canEdit)}}>
+            {{#each covenants}}
+            <option value="{{id}}" {{#if (eq id ../covenant.id)}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+        </select>
+        <span>{{localize "ARM5E_SOLO.Dashboard.Year"}}: {{year}}</span>
+    </header>
+
+    {{#if covenant}}
+    <section class="solo-finances">
+        <h2>{{localize "ARM5E_SOLO.Finance.Title"}}</h2>
+        {{#if sources.length}}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Type"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Income"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each sources}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{type}}</td>
+                    <td>{{income}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="hint">{{localize "ARM5E_SOLO.Finance.NoSources"}}</p>
+        {{/if}}
+
+        {{#if financeResults}}
+        <table class="solo-finance-results">
+            <thead>
+                <tr>
+                    <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Effect"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Multiplier"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.NewIncome"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each financeResults}}
+                <tr>
+                    <td>{{sourceName}}</td>
+                    <td>{{localize (concat "ARM5E_SOLO.Finance.Effects." effect)}}</td>
+                    <td>{{multiplier}}</td>
+                    <td>{{resultingIncome}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <button type="button" data-action="applyFinances"><i class="fas fa-check"></i> {{localize
+            "ARM5E_SOLO.Finance.Apply"}}</button>
+        {{else}}
+        <button type="button" data-action="rollFinances" {{disabled (not canEdit)}}><i class="fas fa-dice-d20"></i>
+            {{localize "ARM5E_SOLO.Finance.Roll"}}</button>
+        {{/if}}
+        {{#if hasFinances}}<p class="hint">{{localize "ARM5E_SOLO.Finance.AlreadyRolled"}}</p>{{/if}}
+    </section>
+
+    <section class="solo-adventures">
+        <h2>{{localize "ARM5E_SOLO.Adventure.Title"}}</h2>
+        <p class="hint">{{localize "ARM5E_SOLO.Adventure.SourceHint"}}</p>
+        <div class="solo-story-sources">
+            {{#each storySources}}
+            <div class="solo-story-source">
+                <input type="hidden" name="storySources.{{@index}}.id" value="{{id}}">
+                <input name="storySources.{{@index}}.name" type="text" value="{{name}}" {{disabled (not ../canEdit)}}>
+                <select name="storySources.{{@index}}.severity" {{disabled (not ../canEdit)}}>
+                    <option value="minor" {{#if (eq severity "minor" )}}selected{{/if}}>{{localize
+                        "ARM5E_SOLO.Adventure.Minor"}}</option>
+                    <option value="major" {{#if (eq severity "major" )}}selected{{/if}}>{{localize
+                        "ARM5E_SOLO.Adventure.Major"}}</option>
+                </select>
+                <button type="button" data-action="deleteStorySource" data-source-id="{{id}}" {{disabled (not
+                    ../canEdit)}} title="{{localize " ARM5E_SOLO.Adventure.DeleteSource"}}"><i
+                        class="fas fa-trash"></i></button>
+            </div>
+            {{/each}}
+        </div>
+        <button type="button" data-action="addStorySource" {{disabled (not canEdit)}}><i class="fas fa-plus"></i>
+            {{localize "ARM5E_SOLO.Adventure.AddSource"}}</button>
+        <button type="button" data-action="generateAdventures" {{disabled (not canEdit)}}><i
+                class="fas fa-dice-d20"></i> {{localize "ARM5E_SOLO.Adventure.Generate"}}</button>
+
+        {{#if adventures.length}}
+        <table class="solo-adventure-results">
+            <thead>
+                <tr>
+                    <th>{{localize "ARM5E_SOLO.Adventure.Origin"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Adventure.Timing"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Adventure.Difficulty"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Adventure.Challenges"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Adventure.Status"}}</th>
+                </tr>
+            </thead>
+            <tbody>{{#each adventures}}
+                <tr>
+                    <td>{{origin.type}}</td>
+                    <td>{{timing.season}}</td>
+                    <td>{{difficulty.difficulty}}</td>
+                    <td>{{complexity.challengeSets}}</td>
+                    <td>{{status}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+    </section>
+    {{else}}
+    <p class="hint">{{localize "ARM5E_SOLO.Dashboard.NoCovenant"}}</p>
+    {{/if}}
+</section>
