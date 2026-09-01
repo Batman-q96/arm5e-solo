@@ -1,11 +1,11 @@
 {
-  "name": "arm5e-solo",
-  "version": "0.1.0",
-  "private": true,
-  "description": "A Foundry VTT module for solo Ars Magica Fifth Edition play.",
-  "scripts": {
-    "check": "node --check scripts/arm5e-solo.js",
-    "validate:json": "node -e \"for (const file of ['module.json', 'lang/en.json']) JSON.parse(require('node:fs').readFileSync(file, 'utf8')); console.log('JSON valid')\"",
-    "validate": "npm run validate:json && npm run check"
-  }
+    "name": "arm5e-solo",
+    "version": "0.1.0",
+    "private": true,
+    "description": "A Foundry VTT module for solo Ars Magica Fifth Edition play.",
+    "scripts": {
+        "check": "node --check scripts/arm5e-solo.js",
+        "validate:json": "node -e \"for (const file of ['module.json', 'lang/en.json']) JSON.parse(require('node:fs').readFileSync(file, 'utf8')); console.log('JSON valid')\"",
+        "validate": "npm run validate:json && npm run check"
+    }
 }
