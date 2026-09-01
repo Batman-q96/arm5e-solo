@@ -11,6 +11,7 @@ import {
 } from "../scripts/rules.js";
 
 test("finance rolls map to their specified effects", () => {
+  assert.equal(getFinanceResult(0).effect, "contraction");
   assert.equal(getFinanceResult(8).effect, "statusQuo");
   assert.equal(getFinanceResult(10).multiplier, 1.2);
   assert.equal(getFinanceResult(99).effect, "boom");

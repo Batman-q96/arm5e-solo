@@ -19,6 +19,7 @@ export function buildFinanceResults(covenant, rolls) {
       priorIncome: income,
       resultingIncome: applyIncomeMultiplier(income, result.multiplier),
       stressTotal: roll.total,
+      naturalZero: Boolean(roll.naturalZero),
       botch: Boolean(roll.botch),
       effect: result.effect,
       multiplier: result.multiplier

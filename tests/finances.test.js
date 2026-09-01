@@ -16,3 +16,13 @@ test("finance processing targets every covenant incoming source independently", 
   assert.deepEqual(results.map((result) => result.resultingIncome), [120, 32]);
   assert.deepEqual(results.map((result) => result.sourceId), ["grain", "rent"]);
 });
+
+test("a natural zero and a botch remain distinct in finance history", () => {
+  const results = buildFinanceResults(covenant, [
+    { total: 0, naturalZero: true, botch: false },
+    { total: 0, naturalZero: true, botch: true }
+  ]);
+  assert.deepEqual(results.map((result) => result.effect), ["contraction", "slump"]);
+  assert.deepEqual(results.map((result) => result.naturalZero), [true, true]);
+  assert.deepEqual(results.map((result) => result.botch), [false, true]);
+});

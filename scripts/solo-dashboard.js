@@ -90,7 +90,12 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     const rolls = [];
     for (const source of sources) {
       const roll = await new Roll("1ds").evaluate();
-      rolls.push({ total: roll.total, botch: roll.total === 0 });
+      const naturalZero = roll.dice[0]?.total === 0;
+      rolls.push({
+        total: roll.total,
+        naturalZero,
+        botch: naturalZero && Number(roll.botches) > 0
+      });
       await roll.toMessage({ flavor: game.i18n.format("ARM5E_SOLO.Finance.RollFlavor", { source: source.name }) });
     }
     this.financeResults = buildFinanceResults(this.covenant, rolls);
