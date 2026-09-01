@@ -1,0 +1,31 @@
+{
+  "id": "arm5e-solo",
+  "title": "ArM5e Solo",
+  "description": "Tools and workflow support for solo Ars Magica Fifth Edition play.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Batman-q96"
+    }
+  ],
+  "esmodules": [
+    "scripts/arm5e-solo.js"
+  ],
+  "styles": [
+    "styles/arm5e-solo.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "url": "https://github.com/Batman-q96/arm5e-solo",
+  "manifest": "https://raw.githubusercontent.com/Batman-q96/arm5e-solo/main/module.json",
+  "download": "https://github.com/Batman-q96/arm5e-solo/releases/latest/download/module.zip"
+}

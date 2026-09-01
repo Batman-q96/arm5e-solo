@@ -1,0 +1,10 @@
+{
+  "ARM5E_SOLO": {
+    "Settings": {
+      "Enabled": {
+        "Name": "Enable ArM5e Solo",
+        "Hint": "Enable the ArM5e Solo module features for this world."
+      }
+    }
+  }
+}
