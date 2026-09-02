@@ -32,6 +32,8 @@
             "NoSources": "This covenant has no income sources. Add incomingSource items on its Economics tab.",
             "NoRolls": "No income fluctuation rolls have been recorded yet.",
             "LatestRun": "Since the last update",
+            "DiaryName": "Income sources recalculated ({year})",
+            "DiaryLine": "{source}: {prior} \u2192 {resulting} ({effect})",
             "RollFlavor": "Annual income roll: {source}",
             "ConfirmTitle": "Apply income changes?",
             "ConfirmContent": "This permanently updates each covenant income source and records the annual results.",
@@ -52,7 +54,9 @@
             "Open": "Open covenant automations",
             "RecalculateIncome": "Recalculate selected income sources each Spring",
             "UpdateWealth": "Apply annual income less expenses to covenant wealth each Spring",
-            "CollectVis": "Harvest vis sources when their collection season begins"
+            "CollectVis": "Harvest vis sources when their collection season begins",
+            "WealthDiaryName": "Covenant income collected ({year})",
+            "WealthDiaryBody": "Net change: {change}. New wealth: {wealth}."
         }
     }
 }

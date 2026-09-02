@@ -30,6 +30,27 @@ export function buildFinanceResults(covenant, rolls, selectedIds = null) {
   });
 }
 
+export async function createIncomeFluctuationDiaryEntry(covenant, year, results) {
+  const currentDate = game.settings.get("arm5e", "currentDate");
+  const lines = results.map((result) => game.i18n.format("ARM5E_SOLO.Finance.DiaryLine", {
+    source: result.sourceName,
+    prior: result.priorIncome,
+    resulting: result.resultingIncome,
+    effect: game.i18n.localize(`ARM5E_SOLO.Finance.Effects.${result.effect}`)
+  }));
+  const entryData = {
+    name: game.i18n.format("ARM5E_SOLO.Finance.DiaryName", { year }),
+    type: "diaryEntry",
+    system: {
+      description: `<ul>${lines.map((line) => `<li>${line}</li>`).join("")}</ul>`,
+      done: true,
+      activity: "resource",
+      dates: [{ season: currentDate?.season ?? "spring", year, applied: true }]
+    }
+  };
+  return covenant.createEmbeddedDocuments("Item", [entryData]);
+}
+
 export async function applyFinanceResults(covenant, year, results, runId = foundry.utils.randomID()) {
   if (!covenant.isOwner) throw new Error("You do not have permission to update this covenant.");
   for (const result of results) {
@@ -37,6 +58,7 @@ export async function applyFinanceResults(covenant, year, results, runId = found
     if (!source || source.type !== "incomingSource") continue;
     await source.update({ "system.incoming": result.resultingIncome });
   }
+  await createIncomeFluctuationDiaryEntry(covenant, year, results);
   return updateSoloData(covenant, (data) => {
     const record = getYearRecord(data, year) ?? createYearRecord(year);
     record.finances = results;

@@ -16,6 +16,20 @@ export function getNetWealthChange(covenant) {
   return Math.round(income - expenses);
 }
 
+export async function createWealthCollectionDiaryEntry(covenant, year, season, change, wealth) {
+  const entryData = {
+    name: game.i18n.format("ARM5E_SOLO.Automations.WealthDiaryName", { year }),
+    type: "diaryEntry",
+    system: {
+      description: `<p>${game.i18n.format("ARM5E_SOLO.Automations.WealthDiaryBody", { change, wealth })}</p>`,
+      done: true,
+      activity: "resource",
+      dates: [{ season, year, applied: true }]
+    }
+  };
+  return covenant.createEmbeddedDocuments("Item", [entryData]);
+}
+
 export async function processCovenantDates(covenant, previousDate, targetDate, rollStressDie) {
   if (!covenant.isOwner) return [];
   const data = getSoloData(covenant);
@@ -38,6 +52,7 @@ export async function processCovenantDates(covenant, previousDate, targetDate, r
       const change = getNetWealthChange(covenant);
       const wealth = (Number(covenant.system.finances.wealth) || 0) + change;
       await covenant.update({ "system.finances.wealth": wealth });
+      await createWealthCollectionDiaryEntry(covenant, date.year, date.season, change, wealth);
       events.push({ type: "wealth", change, wealth });
     }
     if (settings.collectVis) {
