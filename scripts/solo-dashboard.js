@@ -21,7 +21,6 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     form: { handler: SoloDashboard.#onSubmit, submitOnChange: true, closeOnSubmit: false },
     actions: {
       rollFinances: SoloDashboard.rollFinances,
-      applyFinances: SoloDashboard.applyFinances,
       addStorySource: SoloDashboard.addStorySource,
       deleteStorySource: SoloDashboard.deleteStorySource,
       generateAdventures: SoloDashboard.generateAdventures
@@ -47,12 +46,14 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       covenants: game.actors.filter((actor) => actor.type === "covenant"),
       financeResults: this.financeResults,
       hasFinances: covenant && year ? hasFinanceResults(covenant, year) : false,
+      incomeBotchDice: soloData?.incomeBotchDice ?? 1,
       adventures: yearRecord?.adventures ?? [],
       sources: covenant ? getIncomingSources(covenant).map((source) => ({
         id: source.id,
         name: source.name,
         type: source.system.type,
-        income: source.system.incoming
+        income: source.system.incoming,
+        selected: !soloData.incomeSourceSelectionInitialized || soloData.selectedIncomeSourceIds.includes(source.id)
       })) : [],
       storySources: soloData?.storySources ?? [],
       year
@@ -66,15 +67,21 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       this.render();
       return;
     }
-    if (!this.covenant || !this.covenant.isOwner || !formData.object.storySources) return;
-    const sources = Object.values(foundry.utils.expandObject(formData.object.storySources));
+    if (!this.covenant || !this.covenant.isOwner) return;
     await updateSoloData(this.covenant, (data) => {
-      data.storySources = sources.map((source) => ({
-        id: source.id,
-        name: source.name?.trim() || game.i18n.localize("ARM5E_SOLO.Adventure.UnnamedSource"),
-        severity: source.severity === "major" ? "major" : "minor",
-        returnPressure: Number(source.returnPressure) || 0
-      }));
+      data.incomeBotchDice = Math.max(0, Math.floor(Number(formData.object.incomeBotchDice) || 0));
+      const selected = form.querySelectorAll('input[name="selectedIncomeSourceIds"]:checked');
+      data.selectedIncomeSourceIds = Array.from(selected, (input) => input.value);
+      data.incomeSourceSelectionInitialized = true;
+      if (formData.object.storySources) {
+        const sources = Object.values(foundry.utils.expandObject(formData.object.storySources));
+        data.storySources = sources.map((source) => ({
+          id: source.id,
+          name: source.name?.trim() || game.i18n.localize("ARM5E_SOLO.Adventure.UnnamedSource"),
+          severity: source.severity === "major" ? "major" : "minor",
+          returnPressure: Number(source.returnPressure) || 0
+        }));
+      }
       return data;
     });
   }
@@ -85,23 +92,30 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _rollFinances() {
     if (!this.covenant) return ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.Dashboard.NoCovenant"));
-    const sources = getIncomingSources(this.covenant);
+    const soloData = getSoloData(this.covenant);
+    const selectedIds = soloData.incomeSourceSelectionInitialized ? soloData.selectedIncomeSourceIds : null;
+    const sources = getIncomingSources(this.covenant, selectedIds);
     if (!sources.length) return ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.Finance.NoSources"));
     const rolls = [];
     for (const source of sources) {
-      const roll = new CONFIG.Dice.ArsRoll("1ds");
+      const roll = new CONFIG.Dice.ArsRoll(`${soloData.incomeBotchDice}ds`);
       await roll.roll();
       const die = roll.dice[0];
-      const botch = Boolean(die?.botchCheck && Number(roll.botches) > 0);
-      const naturalZero = roll.total === 0 && !botch;
+      const total = roll.total;
+      const botch = total < 0 || Boolean(die?.botchCheck && Number(roll.botches) > 0);
+      const naturalZero = total === 0 && !botch;
       rolls.push({
-        total: roll.total,
+        total,
         naturalZero,
         botch
       });
       await this._createFinanceRollMessage(roll, source, botch);
     }
-    this.financeResults = buildFinanceResults(this.covenant, rolls);
+    this.financeResults = buildFinanceResults(this.covenant, rolls, selectedIds);
+    const year = game.settings.get("arm5e", "currentDate")?.year;
+    if (!Number.isInteger(year)) return ui.notifications.error(game.i18n.localize("ARM5E_SOLO.Dashboard.NoYear"));
+    await applyFinanceResults(this.covenant, year, this.financeResults);
+    ui.notifications.info(game.i18n.localize("ARM5E_SOLO.Finance.Applied"));
     this.render();
   }
 
@@ -143,25 +157,6 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     );
     const message = new messageClass(messageData);
     await messageClass.create(message.toObject());
-  }
-
-  static async applyFinances() {
-    await this._applyFinances();
-  }
-
-  async _applyFinances() {
-    if (!this.covenant || !this.financeResults?.length) return;
-    const year = game.settings.get("arm5e", "currentDate")?.year;
-    if (!Number.isInteger(year)) return ui.notifications.error(game.i18n.localize("ARM5E_SOLO.Dashboard.NoYear"));
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
-      window: { title: game.i18n.localize("ARM5E_SOLO.Finance.ConfirmTitle") },
-      content: `<p>${game.i18n.localize("ARM5E_SOLO.Finance.ConfirmContent")}</p>`
-    });
-    if (!confirmed) return;
-    await applyFinanceResults(this.covenant, year, this.financeResults);
-    this.financeResults = null;
-    ui.notifications.info(game.i18n.localize("ARM5E_SOLO.Finance.Applied"));
-    this.render();
   }
 
   static async addStorySource() {

@@ -26,3 +26,14 @@ test("a natural zero and a botch remain distinct in finance history", () => {
   assert.deepEqual(results.map((result) => result.naturalZero), [true, true]);
   assert.deepEqual(results.map((result) => result.botch), [false, true]);
 });
+
+test("finance processing can target persisted income source selections", () => {
+  const results = buildFinanceResults(covenant, [{ total: 9 }], ["rent"]);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].sourceId, "rent");
+  assert.equal(results[0].resultingIncome, 42);
+});
+
+test("an empty persisted selection rolls no income sources", () => {
+  assert.equal(getIncomingSources(covenant, []).length, 0);
+});

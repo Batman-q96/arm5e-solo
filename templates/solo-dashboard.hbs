@@ -16,7 +16,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th class="solo-income-selection">{{localize "ARM5E_SOLO.Finance.Select"}}</th>
+                    <th class="solo-income-source">{{localize "ARM5E_SOLO.Finance.Source"}}</th>
                     <th>{{localize "ARM5E_SOLO.Finance.Type"}}</th>
                     <th>{{localize "ARM5E_SOLO.Finance.Income"}}</th>
                 </tr>
@@ -24,7 +25,9 @@
             <tbody>
                 {{#each sources}}
                 <tr>
-                    <td>{{name}}</td>
+                    <td class="solo-income-selection"><input type="checkbox" name="selectedIncomeSourceIds"
+                        value="{{id}}" {{checked selected}} {{disabled (not ../canEdit)}}></td>
+                    <td class="solo-income-source">{{name}}</td>
                     <td>{{type}}</td>
                     <td>{{income}}</td>
                 </tr>
@@ -35,6 +38,13 @@
         <p class="hint">{{localize "ARM5E_SOLO.Finance.NoSources"}}</p>
         {{/if}}
 
+        <div class="solo-finance-actions">
+            <label for="arm5e-solo-income-botch-dice">{{localize "ARM5E_SOLO.Finance.BotchDice"}}</label>
+            <input id="arm5e-solo-income-botch-dice" name="incomeBotchDice" type="number" min="0" step="1"
+                value="{{incomeBotchDice}}" {{disabled (not canEdit)}}>
+            <button type="button" data-action="rollFinances" {{disabled (not canEdit)}}><i class="fas fa-dice-d20"></i>
+                {{localize "ARM5E_SOLO.Finance.Roll"}}</button>
+        </div>
         {{#if financeResults}}
         <table class="solo-finance-results">
             <thead>
@@ -58,11 +68,6 @@
                 {{/each}}
             </tbody>
         </table>
-        <button type="button" data-action="applyFinances"><i class="fas fa-check"></i> {{localize
-            "ARM5E_SOLO.Finance.Apply"}}</button>
-        {{else}}
-        <button type="button" data-action="rollFinances" {{disabled (not canEdit)}}><i class="fas fa-dice-d20"></i>
-            {{localize "ARM5E_SOLO.Finance.Roll"}}</button>
         {{/if}}
         {{#if hasFinances}}<p class="hint">{{localize "ARM5E_SOLO.Finance.AlreadyRolled"}}</p>{{/if}}
     </section>

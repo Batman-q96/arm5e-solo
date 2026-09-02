@@ -1,12 +1,15 @@
 import { applyIncomeMultiplier, getFinanceResult } from "./rules.js";
 import { createYearRecord, getSoloData, getYearRecord, updateSoloData } from "./storage.js";
 
-export function getIncomingSources(covenant) {
-  return covenant.items.filter((item) => item.type === "incomingSource");
+export function getIncomingSources(covenant, selectedIds = null) {
+  const sources = covenant.items.filter((item) => item.type === "incomingSource");
+  if (selectedIds === null) return sources;
+  const selected = new Set(selectedIds);
+  return sources.filter((source) => selected.has(source.id));
 }
 
-export function buildFinanceResults(covenant, rolls) {
-  const sources = getIncomingSources(covenant);
+export function buildFinanceResults(covenant, rolls, selectedIds = null) {
+  const sources = getIncomingSources(covenant, selectedIds);
   if (rolls.length !== sources.length) throw new Error("Each income source requires one finance roll.");
   return sources.map((source, index) => {
     const income = Number(source.system.incoming) || 0;
@@ -37,6 +40,8 @@ export async function applyFinanceResults(covenant, year, results) {
   return updateSoloData(covenant, (data) => {
     const record = getYearRecord(data, year) ?? createYearRecord(year);
     record.finances = results;
+    record.financeRolls ??= [];
+    record.financeRolls.push({ results, appliedAt: new Date().toISOString() });
     record.updatedAt = new Date().toISOString();
     data.years[String(year)] = record;
     return data;

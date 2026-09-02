@@ -16,6 +16,30 @@
     width: 100%;
 }
 
+.solo-finances .solo-income-selection {
+    text-align: center;
+    width: 42px;
+}
+
+.solo-finances .solo-income-selection input {
+    margin: 0;
+}
+
+.solo-finances .solo-income-source {
+    text-align: left;
+}
+
+.solo-finance-actions {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}
+
+.solo-finance-actions input {
+    flex: 0 0 48px;
+    text-align: center;
+}
+
 .solo-finance-results {
     border-left: 3px solid var(--color-warm-2);
 }

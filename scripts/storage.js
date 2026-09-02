@@ -5,6 +5,9 @@ const SCHEMA_VERSION = 1;
 export function createSoloData() {
   return {
     schemaVersion: SCHEMA_VERSION,
+    incomeBotchDice: 1,
+    incomeSourceSelectionInitialized: false,
+    selectedIncomeSourceIds: [],
     storySources: [],
     years: {}
   };
@@ -13,6 +16,11 @@ export function createSoloData() {
 export function normalizeSoloData(data) {
   const normalized = data && typeof data === "object" ? foundry.utils.deepClone(data) : createSoloData();
   normalized.schemaVersion = SCHEMA_VERSION;
+  normalized.incomeBotchDice = Number.isInteger(normalized.incomeBotchDice)
+    ? Math.max(0, normalized.incomeBotchDice)
+    : 1;
+  normalized.incomeSourceSelectionInitialized ??= false;
+  normalized.selectedIncomeSourceIds ??= [];
   normalized.storySources ??= [];
   normalized.years ??= {};
   return normalized;
