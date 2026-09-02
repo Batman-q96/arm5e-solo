@@ -33,7 +33,7 @@
             "NoRolls": "No income fluctuation rolls have been recorded yet.",
             "LatestRun": "Since the last update",
             "DiaryName": "Income sources recalculated ({year})",
-            "DiaryLine": "{source}: roll {roll} \u2192 {prior} \u2192 {resulting} ({effect})",
+            "DiaryLine": "{source}: {prior} \u2192 {resulting} (roll {roll}: {effect})",
             "RollFlavor": "Annual income roll: {source}",
             "ConfirmTitle": "Apply income changes?",
             "ConfirmContent": "This permanently updates each covenant income source and records the annual results.",
