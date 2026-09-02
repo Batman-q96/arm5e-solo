@@ -9,13 +9,14 @@ const MODULE_ID = "arm5e-solo";
 Hooks.once("init", () => {
   console.log(`${MODULE_ID} | Initializing`);
 
-  game.settings.register(MODULE_ID, "enabled", {
-    name: "ARM5E_SOLO.Settings.Enabled.Name",
-    hint: "ARM5E_SOLO.Settings.Enabled.Hint",
+  game.settings.register(MODULE_ID, "consolidateMenu", {
+    name: "ARM5E_SOLO.Settings.ConsolidateMenu.Name",
+    hint: "ARM5E_SOLO.Settings.ConsolidateMenu.Hint",
     scope: "world",
     config: true,
     type: Boolean,
-    default: true
+    default: true,
+    onChange: () => ui.controls.render(true)
   });
 
   game.settings.register(MODULE_ID, "lastComputedDate", {
@@ -27,7 +28,6 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", async () => {
-  if (!game.settings.get(MODULE_ID, "enabled")) return;
   if (game.system.id !== "arm5e") {
     ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.SystemRequired"));
     return;
@@ -40,35 +40,45 @@ Hooks.once("ready", async () => {
 });
 
 Hooks.on("getSceneControlButtons", (controls) => {
-  if (!game.settings.get(MODULE_ID, "enabled") || game.system.id !== "arm5e") return;
+  if (game.system.id !== "arm5e") return;
+  const soloTools = {
+    soloDashboard: {
+      name: "soloDashboard",
+      order: 6,
+      title: game.i18n.localize("ARM5E_SOLO.Dashboard.Open"),
+      icon: "fas fa-calendar-days",
+      visible: true,
+      button: true,
+      onChange: (event, active) => active && openSoloDashboard()
+    },
+    soloAutomations: {
+      name: "soloAutomations",
+      order: 7,
+      title: game.i18n.localize("ARM5E_SOLO.Automations.Open"),
+      icon: "fas fa-gears",
+      visible: true,
+      button: true,
+      onChange: (event, active) => active && openCovenantAutomations()
+    }
+  };
+  if (game.settings.get(MODULE_ID, "consolidateMenu") && controls.ArsMagica) {
+    Object.assign(controls.ArsMagica.tools, soloTools);
+    return;
+  }
   controls.arm5eSolo = {
     name: "arm5eSolo",
     title: game.i18n.localize("ARM5E_SOLO.Dashboard.Title"),
     icon: "fas fa-dice-d20",
     visible: true,
     tools: {
-      dashboard: {
-        name: "dashboard",
-        title: game.i18n.localize("ARM5E_SOLO.Dashboard.Open"),
-        icon: "fas fa-calendar-days",
-        visible: true,
-        button: true,
-        onChange: (event, active) => active && openSoloDashboard()
-      },
-      automations: {
-        name: "automations",
-        title: game.i18n.localize("ARM5E_SOLO.Automations.Open"),
-        icon: "fas fa-gears",
-        visible: true,
-        button: true,
-        onChange: (event, active) => active && openCovenantAutomations()
-      }
+      dashboard: soloTools.soloDashboard,
+      automations: soloTools.soloAutomations
     }
   };
 });
 
 Hooks.on("arm5e-date-change", async (date) => {
-  if (!game.settings.get(MODULE_ID, "enabled") || game.system.id !== "arm5e") return;
+  if (game.system.id !== "arm5e") return;
   const targetDate = normalizeDate(date);
   const previousDate = game.settings.get(MODULE_ID, "lastComputedDate");
   if (previousDate && game.user.isGM) {

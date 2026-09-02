@@ -2,9 +2,9 @@
     "ARM5E_SOLO": {
         "SystemRequired": "ArM5e Solo requires the ArM5e game system.",
         "Settings": {
-            "Enabled": {
-                "Name": "Enable ArM5e Solo",
-                "Hint": "Enable the ArM5e Solo module features for this world."
+            "ConsolidateMenu": {
+                "Name": "Merge with ArM5e toolbar (requires refresh)",
+                "Hint": "Add the solo dashboard and automations tools to ArM5e's own ArsMagica scene-control group instead of a separate one."
             }
         },
         "Dashboard": {
