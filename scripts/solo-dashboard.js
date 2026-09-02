@@ -89,17 +89,60 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!sources.length) return ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.Finance.NoSources"));
     const rolls = [];
     for (const source of sources) {
-      const roll = await new Roll("1ds").evaluate();
-      const naturalZero = roll.dice[0]?.total === 0;
+      const roll = new CONFIG.Dice.ArsRoll("1ds");
+      await roll.roll();
+      const die = roll.dice[0];
+      const botch = Boolean(die?.botchCheck && Number(roll.botches) > 0);
+      const naturalZero = roll.total === 0 && !botch;
       rolls.push({
         total: roll.total,
         naturalZero,
-        botch: naturalZero && Number(roll.botches) > 0
+        botch
       });
-      await roll.toMessage({ flavor: game.i18n.format("ARM5E_SOLO.Finance.RollFlavor", { source: source.name }) });
+      await this._createFinanceRollMessage(roll, source, botch);
     }
     this.financeResults = buildFinanceResults(this.covenant, rolls);
     this.render();
+  }
+
+  async _createFinanceRollMessage(roll, source, botch) {
+    const messageClass = getDocumentClass("ChatMessage");
+    const system = {
+      img: null,
+      label: game.i18n.format("ARM5E_SOLO.Finance.RollFlavor", { source: source.name }),
+      confidence: { allowed: false, score: 0, used: 0 },
+      rootMessage: null,
+      roll: {
+        img: null,
+        itemUuid: null,
+        type: "option",
+        details: "",
+        botchCheck: Boolean(roll.botchCheck),
+        botches: botch ? roll.botches : 0,
+        actorType: "covenant",
+        secondaryScore: 0,
+        divider: 1,
+        difficulty: 0
+      },
+      impact: {
+        applied: false,
+        fatigueLevelsLost: 0,
+        fatigueLevelsPending: 0,
+        fatigueLevelsFail: 0,
+        woundGravity: 0
+      }
+    };
+    const messageData = await roll.toMessage(
+      {
+        flavor: `<p>${foundry.utils.escapeHTML(system.label)}</p>`,
+        speaker: ChatMessage.getSpeaker({ actor: this.covenant }),
+        system,
+        type: "roll"
+      },
+      { create: false }
+    );
+    const message = new messageClass(messageData);
+    await messageClass.create(message.toObject());
   }
 
   static async applyFinances() {
