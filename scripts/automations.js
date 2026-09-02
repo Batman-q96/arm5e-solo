@@ -36,34 +36,44 @@ export async function processCovenantDates(covenant, previousDate, targetDate, r
   const settings = getAutomationSettings(data);
   const runId = foundry.utils.randomID();
   const processed = [];
-  for (const date of getCrossedDates(previousDate, targetDate)) {
-    const events = [];
-    if (date.season === "spring" && settings.recalculateIncome) {
-      const selectedIds = data.incomeSourceSelectionInitialized ? data.selectedIncomeSourceIds : null;
-      const sources = getIncomingSources(covenant, selectedIds);
-      if (sources.length) {
-        const rolls = await Promise.all(sources.map(() => rollStressDie(data.incomeBotchDice)));
-        const results = buildFinanceResults(covenant, rolls, selectedIds);
-        await applyFinanceResults(covenant, date.year, results, runId);
-        events.push({ type: "income", count: results.length });
+  // ArM5e's own vis harvest diary entries read the live world date, so it must be
+  // temporarily pinned to each historical date being caught up, then restored.
+  const restoreDate = game.settings.get("arm5e", "currentDate");
+  try {
+    for (const date of getCrossedDates(previousDate, targetDate)) {
+      const events = [];
+      if (date.season === "spring" && settings.recalculateIncome) {
+        const selectedIds = data.incomeSourceSelectionInitialized ? data.selectedIncomeSourceIds : null;
+        const sources = getIncomingSources(covenant, selectedIds);
+        if (sources.length) {
+          const rolls = await Promise.all(sources.map(() => rollStressDie(data.incomeBotchDice)));
+          const results = buildFinanceResults(covenant, rolls, selectedIds);
+          await applyFinanceResults(covenant, date.year, results, runId, date.season);
+          events.push({ type: "income", count: results.length });
+        }
       }
-    }
-    if (date.season === "spring" && settings.updateWealth) {
-      const change = getNetWealthChange(covenant);
-      const wealth = (Number(covenant.system.finances.wealth) || 0) + change;
-      await covenant.update({ "system.finances.wealth": wealth });
-      await createWealthCollectionDiaryEntry(covenant, date.year, date.season, change, wealth);
-      events.push({ type: "wealth", change, wealth });
-    }
-    if (settings.collectVis) {
-      const visSources = covenant.items.filter((item) => item.type === "visSourcesCovenant" && item.system.season === date.season);
-      for (const source of visSources) {
-        await source.system.harvest();
-        await source.update({ "system.yearHarvested": date.year });
+      if (date.season === "spring" && settings.updateWealth) {
+        const change = getNetWealthChange(covenant);
+        const wealth = (Number(covenant.system.finances.wealth) || 0) + change;
+        await covenant.update({ "system.finances.wealth": wealth });
+        await createWealthCollectionDiaryEntry(covenant, date.year, date.season, change, wealth);
+        events.push({ type: "wealth", change, wealth });
       }
-      if (visSources.length) events.push({ type: "vis", count: visSources.length });
+      if (settings.collectVis) {
+        const visSources = covenant.items.filter((item) => item.type === "visSourcesCovenant" && item.system.season === date.season);
+        if (visSources.length) {
+          await game.settings.set("arm5e", "currentDate", { year: date.year, season: date.season });
+          for (const source of visSources) {
+            await source.system.harvest();
+            await source.update({ "system.yearHarvested": date.year });
+          }
+          events.push({ type: "vis", count: visSources.length });
+        }
+      }
+      if (events.length) processed.push({ date, events });
     }
-    if (events.length) processed.push({ date, events });
+  } finally {
+    await game.settings.set("arm5e", "currentDate", restoreDate);
   }
   if (processed.length) {
     await updateSoloData(covenant, (updated) => {
