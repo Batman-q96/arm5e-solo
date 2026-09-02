@@ -40,6 +40,7 @@
             <thead>
                 <tr>
                     <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.RawRoll"}}</th>
                     <th>{{localize "ARM5E_SOLO.Finance.Effect"}}</th>
                     <th>{{localize "ARM5E_SOLO.Finance.Multiplier"}}</th>
                     <th>{{localize "ARM5E_SOLO.Finance.NewIncome"}}</th>
@@ -49,6 +50,7 @@
                 {{#each financeResults}}
                 <tr>
                     <td>{{sourceName}}</td>
+                    <td>{{stressTotal}}{{#if botch}} ({{localize "ARM5E_SOLO.Finance.Botch"}}){{/if}}</td>
                     <td>{{localize (concat "ARM5E_SOLO.Finance.Effects." effect)}}</td>
                     <td>{{multiplier}}</td>
                     <td>{{resultingIncome}}</td>
