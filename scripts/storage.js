@@ -6,6 +6,7 @@ export function createSoloData() {
   return {
     schemaVersion: SCHEMA_VERSION,
     incomeBotchDice: 1,
+    automations: {},
     incomeSourceSelectionInitialized: false,
     selectedIncomeSourceIds: [],
     storySources: [],
@@ -20,6 +21,8 @@ export function normalizeSoloData(data) {
     ? Math.max(0, normalized.incomeBotchDice)
     : 1;
   normalized.incomeSourceSelectionInitialized ??= false;
+  normalized.automations ??= {};
+  normalized.automationHistory ??= [];
   normalized.selectedIncomeSourceIds ??= [];
   normalized.storySources ??= [];
   normalized.years ??= {};

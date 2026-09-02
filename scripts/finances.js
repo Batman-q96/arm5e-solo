@@ -30,7 +30,7 @@ export function buildFinanceResults(covenant, rolls, selectedIds = null) {
   });
 }
 
-export async function applyFinanceResults(covenant, year, results) {
+export async function applyFinanceResults(covenant, year, results, runId = foundry.utils.randomID()) {
   if (!covenant.isOwner) throw new Error("You do not have permission to update this covenant.");
   for (const result of results) {
     const source = covenant.items.get(result.sourceId);
@@ -41,7 +41,7 @@ export async function applyFinanceResults(covenant, year, results) {
     const record = getYearRecord(data, year) ?? createYearRecord(year);
     record.finances = results;
     record.financeRolls ??= [];
-    record.financeRolls.push({ results, appliedAt: new Date().toISOString() });
+    record.financeRolls.push({ results, appliedAt: new Date().toISOString(), runId });
     record.updatedAt = new Date().toISOString();
     data.years[String(year)] = record;
     return data;
@@ -51,4 +51,18 @@ export async function applyFinanceResults(covenant, year, results) {
 export function hasFinanceResults(covenant, year) {
   const record = getYearRecord(getSoloData(covenant), year);
   return Boolean(record?.finances?.length);
+}
+
+export function getAllFinanceRolls(soloData) {
+  const rows = [];
+  for (const record of Object.values(soloData.years)) {
+    for (const roll of record.financeRolls ?? []) {
+      for (const result of roll.results) {
+        rows.push({ year: record.year, appliedAt: roll.appliedAt, runId: roll.runId, ...result });
+      }
+    }
+  }
+  rows.sort((a, b) => (a.appliedAt < b.appliedAt ? 1 : a.appliedAt > b.appliedAt ? -1 : 0));
+  const latestRunId = rows[0]?.runId;
+  return latestRunId ? rows.filter((row) => row.runId === latestRunId) : [];
 }

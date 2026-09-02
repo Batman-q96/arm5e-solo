@@ -11,6 +11,11 @@
     gap: 8px;
 }
 
+.solo-automation-settings {
+    display: grid;
+    gap: 4px;
+}
+
 .solo-finances table {
     margin-bottom: 10px;
     width: 100%;

@@ -17,7 +17,7 @@
             "YearReminder": "ArM5e Solo: annual setup is due for {{year}}."
         },
         "Finance": {
-            "Title": "Step 0: Covenant Finances",
+            "Title": "Covenant Finances",
             "Select": "Select",
             "Source": "Income Source",
             "Type": "Type",
@@ -30,7 +30,8 @@
             "Multiplier": "Multiplier",
             "Roll": "Roll and apply selected income sources",
             "NoSources": "This covenant has no income sources. Add incomingSource items on its Economics tab.",
-            "AlreadyRolled": "Finances have already been recorded for this year.",
+            "NoRolls": "No income fluctuation rolls have been recorded yet.",
+            "LatestRun": "Since the last update",
             "RollFlavor": "Annual income roll: {source}",
             "ConfirmTitle": "Apply income changes?",
             "ConfirmContent": "This permanently updates each covenant income source and records the annual results.",
@@ -44,6 +45,14 @@
                 "expansion": "Expansion",
                 "boom": "Boom"
             }
+        },
+        "Automations": {
+            "Title": "Covenant Automations",
+            "SectionTitle": "Auto Calculation Settings",
+            "Open": "Open covenant automations",
+            "RecalculateIncome": "Recalculate selected income sources each Spring",
+            "UpdateWealth": "Apply annual income less expenses to covenant wealth each Spring",
+            "CollectVis": "Harvest vis sources when their collection season begins"
         }
     }
 }

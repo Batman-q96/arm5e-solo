@@ -1,5 +1,7 @@
 import { openSoloDashboard } from "./solo-dashboard.js";
+import { openCovenantAutomations } from "./covenant-automations.js";
 import { normalizeDate } from "./dates.js";
+import { processCovenantDates } from "./automations.js";
 import { hasFinanceResults } from "./finances.js";
 
 const MODULE_ID = "arm5e-solo";
@@ -52,15 +54,33 @@ Hooks.on("getSceneControlButtons", (controls) => {
         visible: true,
         button: true,
         onChange: (event, active) => active && openSoloDashboard()
+      },
+      automations: {
+        name: "automations",
+        title: game.i18n.localize("ARM5E_SOLO.Automations.Open"),
+        icon: "fas fa-gears",
+        visible: true,
+        button: true,
+        onChange: (event, active) => active && openCovenantAutomations()
       }
     }
   };
 });
 
-Hooks.on("arm5e-date-change", (date) => {
+Hooks.on("arm5e-date-change", async (date) => {
   if (!game.settings.get(MODULE_ID, "enabled") || game.system.id !== "arm5e") return;
   const targetDate = normalizeDate(date);
   const previousDate = game.settings.get(MODULE_ID, "lastComputedDate");
+  if (previousDate && game.user.isGM) {
+    const rollStressDie = async (botchDice) => {
+      const roll = new CONFIG.Dice.ArsRoll(`${botchDice}ds`);
+      await roll.roll();
+      return { total: roll.total, botch: roll.total < 0, naturalZero: roll.total === 0 };
+    };
+    for (const covenant of game.actors.filter((actor) => actor.type === "covenant")) {
+      await processCovenantDates(covenant, previousDate, targetDate, rollStressDie);
+    }
+  }
   if (targetDate.season === "spring") {
     const covenantNeedsSetup = game.actors.some(
       (actor) => actor.type === "covenant" && actor.isOwner && !hasFinanceResults(actor, targetDate.year)
@@ -68,6 +88,6 @@ Hooks.on("arm5e-date-change", (date) => {
     if (covenantNeedsSetup) ui.notifications.info(game.i18n.format("ARM5E_SOLO.Dashboard.YearReminder", { year: targetDate.year }));
   }
   if (!previousDate || previousDate.year !== targetDate.year || previousDate.season !== targetDate.season) {
-    game.settings.set(MODULE_ID, "lastComputedDate", targetDate);
+    await game.settings.set(MODULE_ID, "lastComputedDate", targetDate);
   }
 });

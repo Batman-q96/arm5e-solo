@@ -1,4 +1,3 @@
-import { applyFinanceResults, buildFinanceResults, getIncomingSources, hasFinanceResults } from "./finances.js";
 import { buildAdventure, evaluateStorySource } from "./adventures.js";
 import { getComplexity } from "./rules.js";
 import { createYearRecord, getSoloData, getYearRecord, updateSoloData } from "./storage.js";
@@ -9,7 +8,6 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options = {}) {
     super(options);
     this.covenantId = options.covenantId ?? game.actors.find((actor) => actor.type === "covenant")?.id ?? null;
-    this.financeResults = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -20,7 +18,6 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
     tag: "form",
     form: { handler: SoloDashboard.#onSubmit, submitOnChange: true, closeOnSubmit: false },
     actions: {
-      rollFinances: SoloDashboard.rollFinances,
       addStorySource: SoloDashboard.addStorySource,
       deleteStorySource: SoloDashboard.deleteStorySource,
       generateAdventures: SoloDashboard.generateAdventures
@@ -44,17 +41,7 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       canEdit: covenant?.isOwner ?? false,
       covenant,
       covenants: game.actors.filter((actor) => actor.type === "covenant"),
-      financeResults: this.financeResults,
-      hasFinances: covenant && year ? hasFinanceResults(covenant, year) : false,
-      incomeBotchDice: soloData?.incomeBotchDice ?? 1,
       adventures: yearRecord?.adventures ?? [],
-      sources: covenant ? getIncomingSources(covenant).map((source) => ({
-        id: source.id,
-        name: source.name,
-        type: source.system.type,
-        income: source.system.incoming,
-        selected: !soloData.incomeSourceSelectionInitialized || soloData.selectedIncomeSourceIds.includes(source.id)
-      })) : [],
       storySources: soloData?.storySources ?? [],
       year
     };
@@ -63,16 +50,11 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
   static async #onSubmit(event, form, formData) {
     if (formData.object.covenantId !== this.covenantId) {
       this.covenantId = formData.object.covenantId;
-      this.financeResults = null;
       this.render();
       return;
     }
     if (!this.covenant || !this.covenant.isOwner) return;
     await updateSoloData(this.covenant, (data) => {
-      data.incomeBotchDice = Math.max(0, Math.floor(Number(formData.object.incomeBotchDice) || 0));
-      const selected = form.querySelectorAll('input[name="selectedIncomeSourceIds"]:checked');
-      data.selectedIncomeSourceIds = Array.from(selected, (input) => input.value);
-      data.incomeSourceSelectionInitialized = true;
       if (formData.object.storySources) {
         const sources = Object.values(foundry.utils.expandObject(formData.object.storySources));
         data.storySources = sources.map((source) => ({
@@ -84,79 +66,6 @@ export class SoloDashboard extends HandlebarsApplicationMixin(ApplicationV2) {
       }
       return data;
     });
-  }
-
-  static async rollFinances() {
-    await this._rollFinances();
-  }
-
-  async _rollFinances() {
-    if (!this.covenant) return ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.Dashboard.NoCovenant"));
-    const soloData = getSoloData(this.covenant);
-    const selectedIds = soloData.incomeSourceSelectionInitialized ? soloData.selectedIncomeSourceIds : null;
-    const sources = getIncomingSources(this.covenant, selectedIds);
-    if (!sources.length) return ui.notifications.warn(game.i18n.localize("ARM5E_SOLO.Finance.NoSources"));
-    const rolls = [];
-    for (const source of sources) {
-      const roll = new CONFIG.Dice.ArsRoll(`${soloData.incomeBotchDice}ds`);
-      await roll.roll();
-      const die = roll.dice[0];
-      const total = roll.total;
-      const botch = total < 0 || Boolean(die?.botchCheck && Number(roll.botches) > 0);
-      const naturalZero = total === 0 && !botch;
-      rolls.push({
-        total,
-        naturalZero,
-        botch
-      });
-      await this._createFinanceRollMessage(roll, source, botch);
-    }
-    this.financeResults = buildFinanceResults(this.covenant, rolls, selectedIds);
-    const year = game.settings.get("arm5e", "currentDate")?.year;
-    if (!Number.isInteger(year)) return ui.notifications.error(game.i18n.localize("ARM5E_SOLO.Dashboard.NoYear"));
-    await applyFinanceResults(this.covenant, year, this.financeResults);
-    ui.notifications.info(game.i18n.localize("ARM5E_SOLO.Finance.Applied"));
-    this.render();
-  }
-
-  async _createFinanceRollMessage(roll, source, botch) {
-    const messageClass = getDocumentClass("ChatMessage");
-    const system = {
-      img: null,
-      label: game.i18n.format("ARM5E_SOLO.Finance.RollFlavor", { source: source.name }),
-      confidence: { allowed: false, score: 0, used: 0 },
-      rootMessage: null,
-      roll: {
-        img: null,
-        itemUuid: null,
-        type: "option",
-        details: "",
-        botchCheck: Boolean(roll.botchCheck),
-        botches: botch ? roll.botches : 0,
-        actorType: "covenant",
-        secondaryScore: 0,
-        divider: 1,
-        difficulty: 0
-      },
-      impact: {
-        applied: false,
-        fatigueLevelsLost: 0,
-        fatigueLevelsPending: 0,
-        fatigueLevelsFail: 0,
-        woundGravity: 0
-      }
-    };
-    const messageData = await roll.toMessage(
-      {
-        flavor: `<p>${foundry.utils.escapeHTML(system.label)}</p>`,
-        speaker: ChatMessage.getSpeaker({ actor: this.covenant }),
-        system,
-        type: "roll"
-      },
-      { create: false }
-    );
-    const message = new messageClass(messageData);
-    await messageClass.create(message.toObject());
   }
 
   static async addStorySource() {

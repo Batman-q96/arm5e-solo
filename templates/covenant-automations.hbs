@@ -1,0 +1,86 @@
+<section class="arm5e-solo-dashboard covenant-automations">
+    <header class="solo-dashboard-header">
+        <label for="arm5e-solo-automation-covenant">{{localize "ARM5E_SOLO.Dashboard.Covenant"}}</label>
+        <select id="arm5e-solo-automation-covenant" name="covenantId" {{disabled (not canEdit)}}>
+            {{#each covenants}}<option value="{{id}}" {{#if (eq id ../covenant.id)}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+        </select>
+    </header>
+    {{#if covenant}}
+    <section class="solo-automation-settings">
+        <h2>{{localize "ARM5E_SOLO.Automations.SectionTitle"}}</h2>
+        <label><input type="checkbox" name="automations.recalculateIncome" {{checked automations.recalculateIncome}}
+                {{disabled (not canEdit)}}> {{localize "ARM5E_SOLO.Automations.RecalculateIncome"}}</label>
+        <label><input type="checkbox" name="automations.updateWealth" {{checked automations.updateWealth}} {{disabled
+                (not canEdit)}}> {{localize "ARM5E_SOLO.Automations.UpdateWealth"}}</label>
+        <label><input type="checkbox" name="automations.collectVis" {{checked automations.collectVis}} {{disabled (not
+                canEdit)}}> {{localize "ARM5E_SOLO.Automations.CollectVis"}}</label>
+    </section>
+
+    <section class="solo-finances">
+        <h2>{{localize "ARM5E_SOLO.Finance.Title"}}</h2>
+        {{#if sources.length}}
+        <table>
+            <thead>
+                <tr>
+                    <th class="solo-income-selection">{{localize "ARM5E_SOLO.Finance.Select"}}</th>
+                    <th class="solo-income-source">{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Type"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Income"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each sources}}
+                <tr>
+                    <td class="solo-income-selection"><input type="checkbox" name="selectedIncomeSourceIds"
+                            value="{{id}}" {{checked selected}} {{disabled (not ../canEdit)}}></td>
+                    <td class="solo-income-source">{{name}}</td>
+                    <td>{{type}}</td>
+                    <td>{{income}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="hint">{{localize "ARM5E_SOLO.Finance.NoSources"}}</p>
+        {{/if}}
+
+        <div class="solo-finance-actions">
+            <label for="arm5e-solo-income-botch-dice">{{localize "ARM5E_SOLO.Finance.BotchDice"}}</label>
+            <input id="arm5e-solo-income-botch-dice" name="incomeBotchDice" type="number" min="0" step="1"
+                value="{{incomeBotchDice}}" {{disabled (not canEdit)}}>
+            <button type="button" data-action="rollFinances" {{disabled (not canEdit)}}><i class="fas fa-dice-d20"></i>
+                {{localize "ARM5E_SOLO.Finance.Roll"}}</button>
+        </div>
+        {{#if financeRolls.length}}
+        <h3>{{localize "ARM5E_SOLO.Finance.LatestRun"}}</h3>
+        <table class="solo-finance-results">
+            <thead>
+                <tr>
+                    <th>{{localize "ARM5E_SOLO.Dashboard.Year"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.RawRoll"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Effect"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.Multiplier"}}</th>
+                    <th>{{localize "ARM5E_SOLO.Finance.NewIncome"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each financeRolls}}
+                <tr>
+                    <td>{{year}}</td>
+                    <td>{{sourceName}}</td>
+                    <td>{{stressTotal}}{{#if botch}} ({{localize "ARM5E_SOLO.Finance.Botch"}}){{/if}}</td>
+                    <td>{{localize (concat "ARM5E_SOLO.Finance.Effects." effect)}}</td>
+                    <td>{{multiplier}}</td>
+                    <td>{{resultingIncome}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="hint">{{localize "ARM5E_SOLO.Finance.NoRolls"}}</p>
+        {{/if}}
+    </section>
+    {{else}}<p class="hint">{{localize "ARM5E_SOLO.Dashboard.NoCovenant"}}</p>{{/if}}
+</section>

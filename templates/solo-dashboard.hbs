@@ -10,68 +10,6 @@
     </header>
 
     {{#if covenant}}
-    <section class="solo-finances">
-        <h2>{{localize "ARM5E_SOLO.Finance.Title"}}</h2>
-        {{#if sources.length}}
-        <table>
-            <thead>
-                <tr>
-                    <th class="solo-income-selection">{{localize "ARM5E_SOLO.Finance.Select"}}</th>
-                    <th class="solo-income-source">{{localize "ARM5E_SOLO.Finance.Source"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.Type"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.Income"}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each sources}}
-                <tr>
-                    <td class="solo-income-selection"><input type="checkbox" name="selectedIncomeSourceIds"
-                            value="{{id}}" {{checked selected}} {{disabled (not ../canEdit)}}></td>
-                    <td class="solo-income-source">{{name}}</td>
-                    <td>{{type}}</td>
-                    <td>{{income}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{else}}
-        <p class="hint">{{localize "ARM5E_SOLO.Finance.NoSources"}}</p>
-        {{/if}}
-
-        <div class="solo-finance-actions">
-            <label for="arm5e-solo-income-botch-dice">{{localize "ARM5E_SOLO.Finance.BotchDice"}}</label>
-            <input id="arm5e-solo-income-botch-dice" name="incomeBotchDice" type="number" min="0" step="1"
-                value="{{incomeBotchDice}}" {{disabled (not canEdit)}}>
-            <button type="button" data-action="rollFinances" {{disabled (not canEdit)}}><i class="fas fa-dice-d20"></i>
-                {{localize "ARM5E_SOLO.Finance.Roll"}}</button>
-        </div>
-        {{#if financeResults}}
-        <table class="solo-finance-results">
-            <thead>
-                <tr>
-                    <th>{{localize "ARM5E_SOLO.Finance.Source"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.RawRoll"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.Effect"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.Multiplier"}}</th>
-                    <th>{{localize "ARM5E_SOLO.Finance.NewIncome"}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each financeResults}}
-                <tr>
-                    <td>{{sourceName}}</td>
-                    <td>{{stressTotal}}{{#if botch}} ({{localize "ARM5E_SOLO.Finance.Botch"}}){{/if}}</td>
-                    <td>{{localize (concat "ARM5E_SOLO.Finance.Effects." effect)}}</td>
-                    <td>{{multiplier}}</td>
-                    <td>{{resultingIncome}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{/if}}
-        {{#if hasFinances}}<p class="hint">{{localize "ARM5E_SOLO.Finance.AlreadyRolled"}}</p>{{/if}}
-    </section>
-
     <section class="solo-adventures">
         <h2>{{localize "ARM5E_SOLO.Adventure.Title"}}</h2>
         <p class="hint">{{localize "ARM5E_SOLO.Adventure.SourceHint"}}</p>
