@@ -5,7 +5,7 @@
     "description": "A Foundry VTT module for solo Ars Magica Fifth Edition play.",
     "type": "module",
     "scripts": {
-        "check": "node --check scripts/arm5e-solo.js && node --check scripts/rules.js && node --check scripts/storage.js && node --check scripts/finances.js && node --check scripts/adventures.js && node --check scripts/solo-dashboard.js",
+        "check": "node --check scripts/arm5e-solo.js && node --check scripts/dates.js && node --check scripts/rules.js && node --check scripts/storage.js && node --check scripts/finances.js && node --check scripts/adventures.js && node --check scripts/solo-dashboard.js",
         "test": "node --test tests",
         "validate:json": "node -e \"for (const file of ['module.json', 'lang/en.json']) JSON.parse(require('node:fs').readFileSync(file, 'utf8')); console.log('JSON valid')\"",
         "validate": "npm run validate:json && npm run check && npm test"
