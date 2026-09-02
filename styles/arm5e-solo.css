@@ -16,6 +16,17 @@
     gap: 4px;
 }
 
+.solo-automation-settings label {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+}
+
+.solo-automation-settings input[type="checkbox"] {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
 .solo-finances table {
     margin-bottom: 10px;
     width: 100%;
