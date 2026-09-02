@@ -57,7 +57,7 @@ export function getFinanceResult(stressTotal, { botch = false } = {}) {
 
 export function applyIncomeMultiplier(income, multiplier) {
   if (!Number.isFinite(income) || income < 0) throw new RangeError("Income must be a non-negative number.");
-  return Math.round(income * multiplier * 100) / 100;
+  return Math.round(income * multiplier);
 }
 
 export function getComplexity(simpleDie, additionalRolls = []) {

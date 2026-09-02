@@ -17,6 +17,7 @@ test("finance rolls map to their specified effects", () => {
   assert.equal(getFinanceResult(99).effect, "boom");
   assert.equal(getFinanceResult(5, { botch: true }).effect, "slump");
   assert.equal(applyIncomeMultiplier(100, 1.2), 120);
+  assert.equal(applyIncomeMultiplier(101, 1.05), 106);
 });
 
 test("complexity uses the agreed Simple Die bands", () => {
