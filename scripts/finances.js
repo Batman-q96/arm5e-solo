@@ -33,6 +33,7 @@ export function buildFinanceResults(covenant, rolls, selectedIds = null) {
 export async function createIncomeFluctuationDiaryEntry(covenant, year, season, results) {
   const lines = results.map((result) => game.i18n.format("ARM5E_SOLO.Finance.DiaryLine", {
     source: result.sourceName,
+    roll: result.botch ? game.i18n.localize("ARM5E_SOLO.Finance.Botch") : result.stressTotal,
     prior: result.priorIncome,
     resulting: result.resultingIncome,
     effect: game.i18n.localize(`ARM5E_SOLO.Finance.Effects.${result.effect}`)
